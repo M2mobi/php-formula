@@ -20,9 +20,19 @@ include:
 {% endif %}
 
 {% for tool,source in tools.items() %}
+version_{{ tool }}:
+  cmd.run:
+    - name: /usr/bin/{{tool}} --version | grep {{ source['version'] }}
+
+cleanup_{{ tool }}:
+  file.absent:
+    - name: /usr/bin/{{tool}}
+    - unless:
+      - cmd: version_{{ tool }}
+
 /usr/bin/{{tool}}:
   file.managed:
-    - source: {{ source['url'] }}
+    - source: {{ source['url'].replace('VERSION_STRING', source['version']) }}
     - source_hash: {{ source['hash'] }}
     - show_changes: False
     - user: {{ salt_user }}
