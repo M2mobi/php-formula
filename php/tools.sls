@@ -22,7 +22,7 @@ include:
 {% for tool,source in tools.items() %}
 version_{{ tool }}:
   cmd.run:
-    - name: /usr/bin/{{tool}} --version | grep {{ source['version'] }}
+    - name: /usr/bin/{{tool}} -v --version 2>&1 | grep {{ source['version'] }}
 
 cleanup_{{ tool }}:
   file.absent:
