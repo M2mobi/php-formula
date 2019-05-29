@@ -20,16 +20,6 @@ include:
 {% endif %}
 
 {% for tool,source in tools.items() %}
-version_{{ tool }}:
-  cmd.run:
-    - name: /usr/bin/{{tool}} -v --version 2>&1 | grep {{ source['version'] }}
-
-cleanup_{{ tool }}:
-  file.absent:
-    - name: /usr/bin/{{tool}}
-    - unless:
-      - cmd: version_{{ tool }}
-
 /usr/bin/{{tool}}:
   file.managed:
     - source: {{ source['url'].replace('VERSION_STRING', source['version']) }}
@@ -38,4 +28,6 @@ cleanup_{{ tool }}:
     - user: {{ salt_user }}
     - group: {{ salt_user }}
     - mode: 755
+    - unless:
+      - \{ /usr/bin/{{tool}} -v 2>&1; /usr/bin/{{tool}} --version 2>&1; \} | grep {{ source['version'] }}
 {% endfor %}
