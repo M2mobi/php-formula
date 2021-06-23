@@ -3,6 +3,7 @@
 {# Template for installing packages #}
 {% from "php/map.jinja" import php with context %}
 {% from "php/macro.jinja" import sls_block %}
+{% from "php/ini.jinja" import php_ini %}
 
 {% set pkginfo = php.lookup.pkgs.get(state) %}
 
@@ -107,6 +108,20 @@ php_install_{{ state }}:
     - pkgs: {{ pkgs|json() }}
 {% if enable_php_repo is defined and enable_php_repo %}
     - enablerepo: {{ enable_php_repo }}
+{% endif %}
+
+{% if state in php %}
+{% if 'opts' in php[state]['ini'] %}
+  {% set state_opts = php[state]['ini']['opts'] %}
+{% else %}
+  {% set state_opts = {} %}
+{% endif %}
+php_{{ state }}_ini:
+  {{ php_ini(php['lookup'][state]['ini'],
+             'php_' ~ state ~ '_ini',
+             state_opts,
+             php[state]['ini']['settings']
+  ) }}
 {% endif %}
 
 {% set service = salt['pillar.get']('php:lookup:fpm:service', 'php-fpm')%}
