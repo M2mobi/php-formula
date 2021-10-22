@@ -110,7 +110,7 @@ php_install_{{ state }}:
     - enablerepo: {{ enable_php_repo }}
 {% endif %}
 
-{% if state in php %}
+{% if state in php and state != 'cli' %}
 {% if 'opts' in php[state]['ini'] %}
   {% set state_opts = php[state]['ini']['opts'] %}
 {% else %}
